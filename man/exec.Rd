@@ -22,7 +22,7 @@ For functions using XX', such as federateComDim, federateSNF, this should be a s
 \item{...}{Other arguments of the function \code{name}, preferably in the same order.}
 }
 \description{
-...
+This wrapper function is used to call all the federated analyse functions provided in the dsMO package suite.
 }
 \examples{
 data(logindata)

@@ -23,7 +23,7 @@
 
 
 #' @title Wrapper call function for federated analysis
-#' @description ...
+#' @description This wrapper function is used to call all the federated analyse functions provided in the dsMO package suite.
 #' @param name A character string naming the function to be called, among federatePCA, federateRCCA, federateComDim, federateSNF.
 #' @param loginFD Login information of the federated server, where the function \code{name} will be executed. 
 #' For functions using X'X, such as federatePCA, federateRCCA, this should be a server with dsMOprimal installed. 
