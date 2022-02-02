@@ -31,14 +31,18 @@
 #' @param logins Login information of data repositories, where dsMOprimal is installed.
 #' @param func Definition of a function for preparation of raw data matrices.
 #' @param symbol The symbol provided when calling the function \code{func} for data preparation.
+#' @param ... Other arguments of the function \code{name}, preferably in the same order.
 #' @import dsSwissKnifeClient
 #' @examples 
 #' data(logindata)
 #' data(procFunc)
 #' \donttest{
 #' exec('federatePCA', loginFD=logindata[,1], logins=logindata[,1:2], func=procFunc$SingleOmics, symbol='rawDataX')
-#' exec('federateRCCA', loginFD=logindata[,1], logins=logindata[,1:2], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
-#' exec('federateComDim', loginFD=logindata[,3], logins=logindata[,1:2], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
+#' exec('federateRCCA', loginFD=logindata[,1], logins=logindata[,1:2], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
+#'       0.001, 0.001, TRUE, 
+#'       dsSwissKnifeClient:::.encode.arg(list(nfold = 2, grid1 = seq(0.001, 1, length = 1), grid2 = seq(0.001, 1, length = 1))))
+#' exec('federateComDim', loginFD=logindata[,3], logins=logindata[,1:2], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
+#'       2, 'none', 'uniform')
 #' exec('federateSNF', loginFD=logindata[,3], logins=logindata[,1:2], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
 #' }
 #' @export
