@@ -58,25 +58,30 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
     if (!is.data.frame(loginFD) || nrow(loginFD)!=1) stop("loginFD should be a 1-row data frame.")
     
     ## username-password prompt
-    kr_service <- "login_database"
+    kr_service <- "logindb"
+    kr_name <- "fd_keyring"
     # for loginFD
     if ((! 'user' %in% colnames(loginFD)) || is.null(loginFD$user)) {
+        readline('Please provide login credentials!')
         options('user.FD' = readline('Username for federated server (loginFD): '))
-        loginFD$user <- loginFD$userserver <- getOption('user.FD')
-        keyring::key_set(service = kr_service, 
+        loginFD$userserver <- loginFD$user <- getOption('user.FD')
+        
+        keyring::key_set(service = kr_service,
                          username = loginFD$user)
-        loginFD$password <- loginFD$passwordserver <- keyring::key_get(service = kr_service,
+        loginFD$passwordserver <- loginFD$password <- keyring::key_get(service = kr_service,
                                                                        username = loginFD$user)
     }
     # for logins
     if ((! 'user' %in% colnames(logins)) || is.null(logins$user)) {
         for (i in 1:nrow(logins)) {
             options('user' = readline(paste0('Username for data server ', i, ' (logins[', i, ',]): ')))
-            logins$user[i] <- logins$userserver[i] <- getOption('user')
+            logins$userserver[i] <- logins$user[i] <- getOption('user')
             keyring::key_set(service = kr_service, 
-                             username = logins$user[i])
-            logins$password[i] <- logins$passwordserver[i] <- keyring::key_get(service = kr_service,
-                                                                               username = logins$user[i])
+                             username = logins$user[i]
+                             )
+            logins$passwordserver[i] <- logins$password[i] <- keyring::key_get(service = kr_service,
+                                                                               username = logins$user[i]
+                                                                               )
         }
     }
 
