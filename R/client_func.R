@@ -32,7 +32,7 @@
 #' @param func Definition of a function for preparation of raw data matrices.
 #' @param symbol The symbol provided when calling the function \code{func} for data preparation.
 #' @param ... Other arguments of the function \code{name}, preferably in the same order.
-#' @import dsSwissKnifeClient
+#' @import dsSwissKnifeClient keyring
 #' @examples 
 #' data(logindata)
 #' data(procFunc)
@@ -52,6 +52,34 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
     if (name %in% c('federateComDim', 'federateSNF') && loginFD$url %in% logins$url) {
         stop(paste0("For ", name, ": loginFD server should not be one of logins servers"))
     }
+    if (name %in% c('federatePCA', 'federateRCCA') && !(loginFD$url %in% logins$url)) {
+        stop(paste0("For ", name, ": loginFD server should be one of logins servers"))
+    }
+    if (!is.data.frame(loginFD) || nrow(loginFD)!=1) stop("loginFD should be a 1-row data frame.")
+    
+    ## username-password prompt
+    kr_service <- "login_database"
+    # for loginFD
+    if ((! 'user' %in% colnames(loginFD)) || is.null(loginFD$user)) {
+        options('user.FD' = readline('Username for federated server (loginFD): '))
+        loginFD$user <- loginFD$userserver <- getOption('user.FD')
+        keyring::key_set(service = kr_service, 
+                         username = loginFD$user)
+        loginFD$password <- loginFD$passwordserver <- keyring::key_get(service = kr_service,
+                                                                       username = loginFD$user)
+    }
+    # for logins
+    if ((! 'user' %in% colnames(logins)) || is.null(logins$user)) {
+        for (i in 1:nrow(logins)) {
+            options('user' = readline(paste0('Username for data server ', i, ' (logins[', i, ',]): ')))
+            logins$user[i] <- logins$userserver[i] <- getOption('user')
+            keyring::key_set(service = kr_service, 
+                             username = logins$user[i])
+            logins$password[i] <- logins$passwordserver[i] <- keyring::key_get(service = kr_service,
+                                                                               username = logins$user[i])
+        }
+    }
+
     ## execute name at loginFD server with data from logins servers
     cally <- list(as.symbol(name),
                   .encode.arg(loginFD),
