@@ -95,12 +95,14 @@ dataProc.BiOmics <- function(conns, symbol) {
 #### Run `exec` on different analyses
 
 
-##### PCA for the virtual cohort combining those from servers in logindata[1:2,]
+##### PCA (Single data block) for the virtual cohort combining those from servers in logins
+*federatePCA* needs to be called at the server with dsMOprimal installed, in loginFD
 ```
 res.pca <- exec('federatePCA', loginFD=logindata[1,], logins=logindata[1:2,],
                 func=dataProc.SingleOmics, symbol='rawDataX')
 ```
-##### RCCA for the virtual cohort combining those from servers in logindata[1:2,]
+##### RCCA (Two data blocks) for the virtual cohort combining those from servers in logins
+*federateRCCA* needs to be called at the server with dsMOprimal installed, in loginFD
 ```
 res.rcca <- exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,],
                  func=dataProc.BiOmics, symbol=c('rawDataX', 'rawDataY'),
@@ -109,13 +111,15 @@ res.rcca <- exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,],
                                          grid1 = seq(0.001, 1, length = 1),
                                          grid2 = seq(0.001, 1, length = 1))))
 ```
-##### ComDim for the virtual cohort combining those from servers in logindata[1:2,]
+##### ComDim (Multiple data blocks) for the virtual cohort combining those from servers in logins
+*federateComDim* needs to be called at the server with dsMOdual installed, in loginFD
 ```
 res.comdim <- exec('federateComDim', loginFD=logindata[3,], logins=logindata[1:2,],
                    func=dataProc.BiOmics, symbol=c('rawDataX', 'rawDataY'),
                    2, 'none', 'uniform')
 ```
-##### SNF for the virtual cohort combining those from servers in logindata[1:2,]
+##### SNF (Multiple data blocks) for the virtual cohort combining those from servers in logins
+*federateSNF* needs to be called at the server with dsMOdual installed, in loginFD
 ```
 res.snf <- exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,],
                 func=dataProc.BiOmics, symbol=c('rawDataX', 'rawDataY'))
