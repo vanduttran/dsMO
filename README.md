@@ -82,7 +82,7 @@ dataProc.BiOmics <- function(conns, symbol) {
         datashield.assign(conns[opn], 'tmp', 
                           as.call(list(as.symbol("setRowNames"),
                                        as.symbol("tmp"),
-                                       dsdsSwissKnifeClient:::.encode.arg(rns[[opn]]))),
+                                       dsSwissKnifeClient:::.encode.arg(rns[[opn]]))),
                           async=T)
     })
     
