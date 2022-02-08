@@ -1,6 +1,6 @@
-#dsMO: non-disclosive federated Multi-Omics analysis
+# dsMO: non-disclosive federated Multi-Omics analysis
 
-##Introduction
+## Introduction
 The dsMO package suit, providing a number of non-disclosive federated Multi-Omics analyses, is comprised of three packages:
 
 1. dsMOprimal, to install on remote servers with data contributing to the virtual cohort
@@ -10,25 +10,26 @@ The dsMO package suit, providing a number of non-disclosive federated Multi-Omic
 3. dsMO, to install on the analyst side
 
 
-##Installation
+## Installation
 ```
     devtools::install_github('vanduttran/dsMO')
 ```
 
-##Examples
+## Examples
 ```
     library(dsMO)
 ```
-- login data
+- Login data
 ```
     logindata <- read.table('logindata_BEAt.txt', header=T)
 ```
-  --  logindata contains login credentials, which can be used to execute as it is.
-  --  Otherwise, to prompt for login credentials:
+logindata contains login credentials, which can be used to execute as it is. Otherwise, to prompt for login credentials:
 ```
     logindata <- logindata[, -c(grep('user|password', colnames(logindata)))]
 ```
+
 - function for data preprocessing: create raw data matrices 
+
   -- One data block: for federated PCA
 ```
     dataProc.SingleOmics <- function(conns, symbol) {
