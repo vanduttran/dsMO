@@ -12,6 +12,7 @@ The *dsMO* package suit, providing a number of non-disclosive federated Multi-Om
 
 ## Installation
 ```
+devtools::install_github('sib-swiss/dsSwissKnifeClient')
 devtools::install_github('vanduttran/dsMO')
 ```
 
