@@ -16,10 +16,12 @@ The dsMO package suit, providing a number of non-disclosive federated Multi-Omic
 
 ** EXAMPLE
 
+    library(dsMO)
+
 - login data
     logindata <- read.table('logindata_BEAt.txt', header=T)
-  logindata contains login credentials, which can be used to execute as it is.
-  Otherwise, to prompt for login credentials:
+  --  logindata contains login credentials, which can be used to execute as it is.
+  --  Otherwise, to prompt for login credentials:
     logindata <- logindata[, -c(grep('user|password', colnames(logindata)))]
 
 - function for data preprocessing: create raw data matrices 
@@ -67,7 +69,7 @@ The dsMO package suit, providing a number of non-disclosive federated Multi-Omic
 - run exec on different analyses
     res.pca <- exec('federatePCA', loginFD=logindata[1,], logins=logindata[1:2,], func=dataProc.SingleOmics, symbol='rawDataX')
 
-    res.rcca <- exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,], func=dataProc, symbol=c('rawDataX', 'rawDataY'),
+    res.rcca <- exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,], func=dataProc.BiOmics, symbol=c('rawDataX', 'rawDataY'),
         0.001, 0.001, TRUE, 
         dsMO:::.encode.arg(list(nfold = 2, grid1 = seq(0.001, 1, length = 1), grid2 = seq(0.001, 1, length = 1))))
     
