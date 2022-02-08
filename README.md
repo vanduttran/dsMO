@@ -1,5 +1,6 @@
-dsMO: non-disclosive federated Multi-Omics analysis
+#dsMO: non-disclosive federated Multi-Omics analysis
 
+##Introduction
 The dsMO package suit, providing a number of non-disclosive federated Multi-Omics analyses, is comprised of three packages:
 
 1. dsMOprimal, to install on remote servers with data contributing to the virtual cohort
@@ -9,27 +10,27 @@ The dsMO package suit, providing a number of non-disclosive federated Multi-Omic
 3. dsMO, to install on the analyst side
 
 
-** INSTALL
-
+##Installation
+```
     devtools::install_github('vanduttran/dsMO')
+```
 
-
-** EXAMPLE
-
+##Examples
+```
     library(dsMO)
-
+```
 - login data
-
+```
     logindata <- read.table('logindata_BEAt.txt', header=T)
-
+```
   --  logindata contains login credentials, which can be used to execute as it is.
   --  Otherwise, to prompt for login credentials:
-
+```
     logindata <- logindata[, -c(grep('user|password', colnames(logindata)))]
-
+```
 - function for data preprocessing: create raw data matrices 
   -- One data block: for federated PCA
-
+```
     dataProc.SingleOmics <- function(conns, symbol) {
         require(dsSwissKnifeClient)
         lapply(conns, function(conn) {
@@ -48,9 +49,9 @@ The dsMO package suit, providing a number of non-disclosive federated Multi-Omic
                               async=T)
         })
     }
-
+```
   -- Two data blocks: for federated RCCA, ComDim, SNF
-
+```
     dataProc.BiOmics <- function(conns, symbol) {
         require(dsSwissKnifeClient)
         lapply(conns, function(conn) {
@@ -70,9 +71,9 @@ The dsMO package suit, providing a number of non-disclosive federated Multi-Omic
         dssSubset(symbol=symbol[1], what='tmp', col.filter="c('LAB_TSC', 'LAB_TRIG', 'LAB_HDL')", datasources=conns)
         dssSubset(symbol=symbol[2], what='tmp', col.filter="c('LAB_GLUC_ADJUSTED', 'PM_BMI_CONTINUOUS')", datasources=conns)
     }
-
+```
 - run exec on different analyses
-
+```
     res.pca <- exec('federatePCA', loginFD=logindata[1,], logins=logindata[1:2,], func=dataProc.SingleOmics, symbol='rawDataX')
 
     res.rcca <- exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,], func=dataProc.BiOmics, symbol=c('rawDataX', 'rawDataY'),
@@ -83,5 +84,5 @@ The dsMO package suit, providing a number of non-disclosive federated Multi-Omic
         2, 'none', 'uniform')
 
     res.snf <- exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,], func=dataProc.BiOmics, symbol=c('rawDataX', 'rawDataY'))
-
+```
 
