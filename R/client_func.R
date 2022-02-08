@@ -37,13 +37,13 @@
 #' data(logindata)
 #' data(procFunc)
 #' \donttest{
-#' exec('federatePCA', loginFD=logindata[1,], logins=logindata[1:2,], func=procFunc$SingleOmics, symbol='rawDataX')
-#' exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
+#' res.pca <- exec('federatePCA', loginFD=logindata[1,], logins=logindata[1:2,], func=procFunc$SingleOmics, symbol='rawDataX')
+#' res.rcca <- exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
 #'       0.001, 0.001, TRUE, 
 #'       dsMO:::.encode.arg(list(nfold = 2, grid1 = seq(0.001, 1, length = 1), grid2 = seq(0.001, 1, length = 1))))
-#' exec('federateComDim', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
+#' res.comdim <- exec('federateComDim', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
 #'       2, 'none', 'uniform')
-#' exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
+#' res.snf <- exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
 #' }
 #' @export
 exec <- function(name, loginFD, logins, func, symbol, ...) {
@@ -59,7 +59,6 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
     
     ## username-password prompt
     kr_service <- "logindb"
-    kr_name <- "fd_keyring"
     # for loginFD
     if ((! 'user' %in% colnames(loginFD)) || is.null(loginFD$user)) {
         readline('Please provide login credentials!')
@@ -77,14 +76,12 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
             options('user' = readline(paste0('Username for data server ', i, ' (logins[', i, ',]): ')))
             logins$userserver[i] <- logins$user[i] <- getOption('user')
             keyring::key_set(service = kr_service, 
-                             username = logins$user[i]
-                             )
+                             username = logins$user[i])
             logins$passwordserver[i] <- logins$password[i] <- keyring::key_get(service = kr_service,
-                                                                               username = logins$user[i]
-                                                                               )
+                                                                               username = logins$user[i])
         }
     }
-
+    #TODO: delete keyring
     ## execute name at loginFD server with data from logins servers
     cally <- list(as.symbol(name),
                   .encode.arg(loginFD),
