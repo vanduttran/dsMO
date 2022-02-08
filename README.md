@@ -1,13 +1,13 @@
 # dsMO: non-disclosive federated Multi-Omics analysis
 
 ## Introduction
-The dsMO package suit, providing a number of non-disclosive federated Multi-Omics analyses, is comprised of three packages:
+The *dsMO* package suit, providing a number of non-disclosive federated Multi-Omics analyses, is comprised of three packages:
 
-1. dsMOprimal, to install on remote servers with data contributing to the virtual cohort
+1. *dsMOprimal*, to install on remote servers with data contributing to the virtual cohort
 
-2. dsMOdual, to install on a remote server different from the previous ones  
+2. *dsMOdual*, to install on a remote server different from the previous ones  
 
-3. dsMO, to install on the analyst side
+3. *dsMO*, to install on the analyst side
 
 
 ## Installation
@@ -23,7 +23,7 @@ library(dsMO)
 ```
 logindata <- read.table('logindata_BEAt.txt', header=T)
 ```
-logindata contains login credentials, which can be used to execute as it is. Otherwise, to prompt for login credentials:
+`logindata` contains login credentials, which can be used to execute as it is. Otherwise, to prompt for login credentials:
 ```
 logindata <- logindata[, -c(grep('user|password', colnames(logindata)))]
 ```
@@ -95,14 +95,14 @@ dataProc.BiOmics <- function(conns, symbol) {
 #### Run `exec` on different analyses
 
 
-##### PCA (Single data block) for the virtual cohort combining those from servers in logins
-*federatePCA* needs to be called at the server with dsMOprimal installed, in loginFD
+##### PCA (Single data block) for the virtual cohort combining those from servers in `logins`
+*federatePCA* needs to be called at the server with *dsMOprimal* installed, in `loginFD`
 ```
 res.pca <- exec('federatePCA', loginFD=logindata[1,], logins=logindata[1:2,],
                 func=dataProc.SingleOmics, symbol='rawDataX')
 ```
-##### RCCA (Two data blocks) for the virtual cohort combining those from servers in logins
-*federateRCCA* needs to be called at the server with dsMOprimal installed, in loginFD
+##### RCCA (Two data blocks) for the virtual cohort combining those from servers in `logins`
+*federateRCCA* needs to be called at the server with *dsMOprimal* installed, in `loginFD`
 ```
 res.rcca <- exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,],
                  func=dataProc.BiOmics, symbol=c('rawDataX', 'rawDataY'),
@@ -111,15 +111,15 @@ res.rcca <- exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,],
                                          grid1 = seq(0.001, 1, length = 1),
                                          grid2 = seq(0.001, 1, length = 1))))
 ```
-##### ComDim (Multiple data blocks) for the virtual cohort combining those from servers in logins
-*federateComDim* needs to be called at the server with dsMOdual installed, in loginFD
+##### ComDim (Multiple data blocks) for the virtual cohort combining those from servers in `logins`
+*federateComDim* needs to be called at the server with *dsMOdual* installed, in `loginFD`
 ```
 res.comdim <- exec('federateComDim', loginFD=logindata[3,], logins=logindata[1:2,],
                    func=dataProc.BiOmics, symbol=c('rawDataX', 'rawDataY'),
                    2, 'none', 'uniform')
 ```
-##### SNF (Multiple data blocks) for the virtual cohort combining those from servers in logins
-*federateSNF* needs to be called at the server with dsMOdual installed, in loginFD
+##### SNF (Multiple data blocks) for the virtual cohort combining those from servers in `logins`
+*federateSNF* needs to be called at the server with *dsMOdual* installed, in `loginFD`
 ```
 res.snf <- exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,],
                 func=dataProc.BiOmics, symbol=c('rawDataX', 'rawDataY'))
