@@ -88,12 +88,12 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
                   .encode.arg(logins),
                   .encode.arg(func, serialize.it=T),
                   .encode.arg(symbol))
-    if (!name %in% c('federatePCA')) cally <- c(cally, list(...)) # pass customized options of the function 'name'
+    cally <- c(cally, list(...)) # pass customized options of the function 'name'
     opalFD <- datashield.login(loginFD)
     tryCatch({
         res <- datashield.aggregate(opalFD,
                                     as.call(cally),
                                     async=T)
-    }, error=function(e) print(paste0("Function exec failed: ", e)), finally=datashield.logout(opalFD))
+    }, error=function(e) print(paste0("Function exec failed: ", e, " --- ", datashield.errors())), finally=datashield.logout(opalFD))
     return (res)
 }
