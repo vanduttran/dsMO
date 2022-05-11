@@ -44,12 +44,13 @@
 #' res.comdim <- exec('federateComDim', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
 #'       2, 'none', 'uniform')
 #' res.snf <- exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
+#' res.umap <- exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
 #' }
 #' @export
 exec <- function(name, loginFD, logins, func, symbol, ...) {
     ## check arguments
-    name <- match.arg(name, choices=c('federatePCA', 'federateRCCA', 'federateComDim', 'federateSNF'))
-    if (name %in% c('federateComDim', 'federateSNF') && loginFD$url %in% logins$url) {
+    name <- match.arg(name, choices=c('federatePCA', 'federateRCCA', 'federateComDim', 'federateSNF', 'federateUMAP'))
+    if (name %in% c('federateComDim', 'federateSNF', 'federateUMAP') && loginFD$url %in% logins$url) {
         stop(paste0("For ", name, ": loginFD server should not be one of logins servers"))
     }
     if (name %in% c('federatePCA', 'federateRCCA') && !(loginFD$url %in% logins$url)) {
