@@ -24,10 +24,10 @@
 
 #' @title Wrapper call function for non-disclosive federated analysis
 #' @description This wrapper function is used to call all the federated analysis functions provided in the dsMO package suite.
-#' @param name A character string naming the function to be called, among federatePCA, federateRCCA, federateComDim, federateSNF.
+#' @param name A character string naming the function to be called, among federatePCA, federateRCCA, federateComDim, federateSNF, federateUMAP, federateHdbscan.
 #' @param loginFD Login information of the federated server, where the function \code{name} will be executed. 
 #' For functions using X'X, such as federatePCA, federateRCCA, this should be a server with dsMOprimal installed. 
-#' For functions using XX', such as federateComDim, federateSNF, this should be a server with dsMOdual installed.
+#' For functions using XX', such as federateComDim, federateSNF, federateUMAP, federateHdbscan, this should be a server with dsMOdual installed.
 #' @param logins Login information of data repositories, where dsMOprimal is installed.
 #' @param func Definition of a function for preparation of raw data matrices.
 #' @param symbol The symbol provided when calling the function \code{func} for data preparation.
@@ -44,13 +44,14 @@
 #' res.comdim <- exec('federateComDim', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
 #'       2, 'none', 'uniform')
 #' res.snf <- exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
-#' res.umap <- exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
+#' res.umap <- exec('federateUMAP', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
+#' res.hdbscan <- exec('federateHdbscan', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
 #' }
 #' @export
 exec <- function(name, loginFD, logins, func, symbol, ...) {
     ## check arguments
-    name <- match.arg(name, choices=c('federatePCA', 'federateRCCA', 'federateComDim', 'federateSNF', 'federateUMAP'))
-    if (name %in% c('federateComDim', 'federateSNF', 'federateUMAP') && loginFD$url %in% logins$url) {
+    name <- match.arg(name, choices=c('federatePCA', 'federateRCCA', 'federateComDim', 'federateSNF', 'federateUMAP', 'federateHdbscan'))
+    if (name %in% c('federateComDim', 'federateSNF', 'federateUMAP', 'federateHdbscan') && loginFD$url %in% logins$url) {
         stop(paste0("For ", name, ": loginFD server should not be one of logins servers"))
     }
     if (name %in% c('federatePCA', 'federateRCCA') && !(loginFD$url %in% logins$url)) {

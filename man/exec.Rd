@@ -7,11 +7,11 @@
 exec(name, loginFD, logins, func, symbol, ...)
 }
 \arguments{
-\item{name}{A character string naming the function to be called, among federatePCA, federateRCCA, federateComDim, federateSNF.}
+\item{name}{A character string naming the function to be called, among federatePCA, federateRCCA, federateComDim, federateSNF, federateUMAP, federateHdbscan.}
 
 \item{loginFD}{Login information of the federated server, where the function \code{name} will be executed. 
 For functions using X'X, such as federatePCA, federateRCCA, this should be a server with dsMOprimal installed. 
-For functions using XX', such as federateComDim, federateSNF, this should be a server with dsMOdual installed.}
+For functions using XX', such as federateComDim, federateSNF, federateUMAP, federateHdbscan, this should be a server with dsMOdual installed.}
 
 \item{logins}{Login information of data repositories, where dsMOprimal is installed.}
 
@@ -35,5 +35,7 @@ res.rcca <- exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,], 
 res.comdim <- exec('federateComDim', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
       2, 'none', 'uniform')
 res.snf <- exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
+res.umap <- exec('federateUMAP', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
+res.hdbscan <- exec('federateHdbscan', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
 }
 }
