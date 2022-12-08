@@ -109,6 +109,8 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
 #' @param variable The variable name used to map to color codes.
 #' @param continuous_scale A logical value indicating whether the coloring mapping is continuous. Default: TRUE.
 #' @param nbreaks An integer indicating the number of intervals into which x is to be cut, less than 1/10 of number of samples, when x is the coloring scale is continuous.
+#' @param colors A vector of colors to interpolate, must be a valid argument to col2rgb(). Default: \code{c('orange', 'blue')}.
+#' @param ... arguments to pass to \code{colorRampPalette}
 #' @return A vector of The color codes for all samples
 #' @import dsSwissKnifeClient
 #' @export
@@ -116,34 +118,35 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
 #' data(logindata)
 #' data(procFunc)
 #' \donttest{
-#' resColors <- coloring(logins=logindata[1:2,], func=procFunc$SingleOmics, symbol='rawDataX', varible='PM_BMI_CONTINUOUS', nbreaks=4)
+#' resColors <- coloring(logins=logindata[1:2,], func=procFunc$SingleOmics, symbol='rawDataX', what='rawDataX_discrete$PM_BMI_CONTINUOUS', continuous_scale=TRUE, nbreaks=4)
+#' resColors <- coloring(logins=logindata[1:2,], func=procFunc$SingleOmics, symbol='rawDataX', what='rawDataX_discrete$PM_BMI_CATEGORICAL', continuous_scale=FALSE, levels=NULL)
 #' }
-coloring <- function(logins, func, symbol, variable, continuous_scale = TRUE, nbreaks = 2) {
-    error <- 0.05
+coloring <- function(logins, func, symbol, what, continuous_scale = TRUE, nbreaks = 2, colors = c('orange', 'blue'), ...) {
+    error <- 0.01
+    if (!grepl("$", what)) stop("what should be a variable of a data frame in form of 'data.frame$variable'")
+    what.df <- strsplit(what, split="$", fixed=T)[[1]]
     opals <- datashield.login(logins)
     tryCatch({
         func(opals, symbol)
         if (continuous_scale) {
-            globalRanges <- dssRange(paste0(symbol, "$", variable), datasources=opals)
-            res <- datashield.aggregate(opals, as.symbol(paste0("mapColor(", 
-                                                                symbol, "$", variable, 
-                                                                ", range.min=", 
-                                                                globalRanges$global[[1]][1]*(1-error), ## down by error
-                                                                ", range.max=", 
-                                                                globalRanges$global[[1]][2]*(1+error), ## up by error
-                                                                ", nbreaks=", nbreaks, ")")), async=T)
+            ranges <- datashield.aggregate(opals, as.symbol(paste0("dsRange(", what, ")")))
+            cally <- list(x=what,
+                          range.min=Reduce(min, ranges)*(1-error), # down min by error
+                          range.max=Reduce(max, ranges)*(1+error), # up max by error
+                          nbreaks=nbreaks,
+                          colors=paste0("'", .encode.arg(colors), "'"))
+            cally <- c(cally, list(...))
+            callys <- paste0("mapColor(", paste(paste(names(cally), cally, sep="="), collapse=", "), ")")
         } else {
-            ds.asFactor(input.var.name=paste0(symbol, "$", variable), 
-                        newobj.name=paste0(symbol, "_", variable),
-                        datasources=opals)
-            globalLevels <- Reduce(union,
-                                   ds.levels(x=paste0(symbol, "_", variable), datasources=opals))
-            res <- datashield.aggregate(opals, as.symbol(paste0("mapColor(", 
-                                                                symbol, "$", variable, 
-                                                                ", levels=", 
-                                                                globalLevels,
-                                                                `", nbreaks=", nbreaks, ")")), async=T)
+            datashield.assign(opals, "what_factor", as.symbol(paste0("dsFactor(", what, ")")))
+            globalLevels <- Reduce(union, datashield.aggregate(opals, as.symbol(paste0("dsLevels(what_factor)"))))
+            cally <- list(x="what_factor",
+                          levels=paste0("'", .encode.arg(globalLevels), "'"),
+                          colors=paste0("'", .encode.arg(colors), "'"))
+            cally <- c(cally, list(...))
+            callys <- paste0("mapColor(", paste(paste(names(cally), cally, sep="="), collapse=", "), ")")
         }
+        res <- datashield.aggregate(opals, as.symbol(callys), async=T)
         resNames <- datashield.aggregate(opals, as.symbol(paste0("rowNames(", symbol, ")")))
     }, error=function(e) print(paste0("Function coloring failed: ", e, " --- ", datashield.errors())), finally=datashield.logout(opals))
     return (setNames(unlist(res), unlist(resNames)))
