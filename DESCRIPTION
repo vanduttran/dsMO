@@ -1,6 +1,6 @@
 Package: dsMO
 Title: Client Side Functions for Federated Multi-Omics Analysis on the Virtual Cohort
-Version: 0.1.16
+Version: 0.1.17
 Authors@R: 
     c(person(given = "Van Du T.",
              family = "Tran",
