@@ -2,5 +2,6 @@
 
 export(coloring)
 export(exec)
+import(DSI)
 import(dsSwissKnifeClient)
 import(keyring)

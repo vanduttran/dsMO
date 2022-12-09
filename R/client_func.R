@@ -22,6 +22,35 @@
 }
 
 
+#' @title Wrapper of datashield.login
+#' @description This function ensures datashield.login to all the servers without error of simultaneously connecting to the same server
+#' @param logins A data frame of login information. See \code{datashield.login}
+#' @return Object(s) of class DSConnection
+#' @import DSI
+#' @keywords internal
+.login <- function(logins) {
+    opals <- list()
+    prev.url <- ''
+    for (i in login$server) {
+        this.url <- logins[logins$server == i,'url']
+        if(this.url == prev.url){
+            cat(paste0('Waiting a bit to avoid spooking the server at ', unname(this.url), "\n"))
+            Sys.sleep(1)
+        }
+        prev.url <- this.url
+        cat(paste0('Connection to ', unname(logins[logins$server == i,'server']),"\n"))
+        
+        tryCatch({
+            opals[i] <- datashield.login(logins[logins$server == i, , drop = FALSE])
+        }, error = function(e){
+            datashield.logout(opals)
+            stop(e)
+        })
+    }
+    return (opals)
+}
+
+
 #' @title Wrapper call function for non-disclosive federated analysis
 #' @description This wrapper function is used to call all the federated analysis functions provided in the dsMO package suite.
 #' @param name A character string naming the function to be called, among federatePCA, federateRCCA, federateComDim, federateSNF, federateUMAP, federateHdbscan.
@@ -91,7 +120,7 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
                   .encode.arg(func, serialize.it=T),
                   .encode.arg(symbol))
     cally <- c(cally, list(...)) # pass customized options of the function 'name'
-    opalFD <- datashield.login(loginFD)
+    opalFD <- .login(loginFD) #datashield.login(loginFD)
     tryCatch({
         res <- datashield.aggregate(opalFD,
                                     as.call(cally),
@@ -124,8 +153,7 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
 coloring <- function(logins, func, symbol, what, continuous_scale = TRUE, nbreaks = 2, colors = c('orange', 'blue'), ...) {
     error <- 0.01
     if (!grepl("$", what)) stop("what should be a variable of a data frame in form of 'data.frame$variable'")
-    what.df <- strsplit(what, split="$", fixed=T)[[1]]
-    opals <- datashield.login(logins)
+    opals <- .login(logins) #datashield.login(logins)
     tryCatch({
         func(opals, symbol)
         if (continuous_scale) {
