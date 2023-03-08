@@ -152,32 +152,41 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
 #' resColors <- coloring(logins=logindata[1:2,], func=procFunc$SingleOmics, symbol='rawDataX', what='rawDataX_discrete$PM_BMI_CONTINUOUS', continuous_scale=TRUE, nbreaks=4)
 #' resColors <- coloring(logins=logindata[1:2,], func=procFunc$SingleOmics, symbol='rawDataX', what='rawDataX_discrete$PM_BMI_CATEGORICAL', continuous_scale=FALSE, levels=NULL)
 #' }
-coloring <- function(logins, func, symbol, what, continuous_scale = TRUE, nbreaks = 2, colors = c('orange', 'blue'), ...) {
+coloring <- function(logins, func, symbol, what, continuous_scale = rep(TRUE, length(what)), nbreaks = 2, colors = c('orange', 'blue'), ...) {
     error <- 0.01
-    if (!grepl("$", what)) stop("what should be a variable of a data frame in form of 'data.frame$variable'")
-    opals <- .login(logins) #datashield.login(logins)
+    if (any(!grepl("$", what))) stop("what should be variables of a data frame in form of 'data.frame$variable'")
+    opals <- .login(logins)
+    func(opals, symbol)
+    args <- list(...)
     tryCatch({
-        func(opals, symbol)
-        if (continuous_scale) {
-            ranges <- datashield.aggregate(opals, as.symbol(paste0("dsRange(", what, ")")))
-            cally <- list(x=what,
-                          range.min=Reduce(min, ranges)*(1-error), # down min by error
-                          range.max=Reduce(max, ranges)*(1+error), # up max by error
-                          nbreaks=nbreaks,
-                          colors=paste0("'", .encode.arg(colors), "'"))
-            cally <- c(cally, list(...))
-            callys <- paste0("mapColor(", paste(paste(names(cally), cally, sep="="), collapse=", "), ")")
-        } else {
-            datashield.assign(opals, "what_factor", as.symbol(paste0("dsFactor(", what, ")")))
-            globalLevels <- Reduce(union, datashield.aggregate(opals, as.symbol(paste0("dsLevels(what_factor)"))))
-            cally <- list(x="what_factor",
-                          levels=paste0("'", .encode.arg(globalLevels), "'"),
-                          colors=paste0("'", .encode.arg(colors), "'"))
-            cally <- c(cally, list(...))
-            callys <- paste0("mapColor(", paste(paste(names(cally), cally, sep="="), collapse=", "), ")")
-        }
-        res <- datashield.aggregate(opals, as.symbol(callys), async=T)
-        resNames <- datashield.aggregate(opals, as.symbol(paste0("rowNames(", symbol, ")")))
-    }, error=function(e) print(paste0("Function coloring failed: ", e, " --- ", datashield.errors())), finally=datashield.logout(opals))
-    return (setNames(unlist(res), unlist(resNames)))
+        res.all <- lapply(1:length(what), function(i) {
+            if (continuous_scale[i]) {
+                ranges <- datashield.aggregate(opals, as.symbol(paste0("dsRange(", what[i], ")")))
+                cally <- list(x=what[i],
+                              range.min=Reduce(min, ranges)*(1-error), # down min by error
+                              range.max=Reduce(max, ranges)*(1+error), # up max by error
+                              nbreaks=nbreaks,
+                              colors=paste0("'", .encode.arg(colors), "'"))
+                cally <- c(cally, args)
+                callys <- paste0("mapColor(", paste(paste(names(cally), cally, sep="="), collapse=", "), ")")
+            } else {
+                datashield.assign(opals, paste0("what_factor_", i), as.symbol(paste0("dsFactor(", what[i], ")")))
+                globalLevels <- Reduce(union, datashield.aggregate(opals, as.symbol(paste0("dsLevels(what_factor_", i, ")"))))
+                cally <- list(x=paste0("what_factor_", i),
+                              levels=paste0("'", .encode.arg(globalLevels), "'"),
+                              colors=paste0("'", .encode.arg(colors), "'"))
+                cally <- c(cally, args)
+                callys <- paste0("mapColor(", paste(paste(names(cally), cally, sep="="), collapse=", "), ")")
+            }
+            res <- datashield.aggregate(opals, as.symbol(callys), async=T)
+            resNames <- datashield.aggregate(opals, as.symbol(paste0("rowNames(", symbol, ")")))
+
+            return (setNames(unlist(res), unlist(resNames)))
+        })
+    }, 
+    error=function(e) print(paste0("Function coloring failed: ", e, " --- ", datashield.errors())), 
+    finally=datashield.logout(opals))
+    names(res.all) <- what
+    
+    return (as.data.frame(do.call(cbind, res.all)))
 }
