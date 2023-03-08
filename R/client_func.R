@@ -189,5 +189,5 @@ coloring <- function(logins, func, symbol, what, continuous_scale = rep(TRUE, le
     finally=datashield.logout(opals))
     names(res.all) <- what
     
-    return (as.data.frame(do.call(cbind, res.all)))
+    return (res.all)
 }
