@@ -157,7 +157,8 @@ coloring <- function(logins, func, symbol, what, continuous_scale = rep(TRUE, le
     if (any(!grepl("$", what))) stop("what should be variables of a data frame in form of 'data.frame$variable'")
     opals <- .login(logins)
     func(opals, symbol)
-    args <- list(...)
+    arglist <- list(...)
+    
     tryCatch({
         res.all <- lapply(1:length(what), function(i) {
             if (continuous_scale[i]) {
@@ -167,7 +168,7 @@ coloring <- function(logins, func, symbol, what, continuous_scale = rep(TRUE, le
                               range.max=Reduce(max, ranges)*(1+error), # up max by error
                               nbreaks=nbreaks,
                               colors=paste0("'", .encode.arg(colors), "'"))
-                cally <- c(cally, args)
+                cally <- c(cally, arglist)
                 callys <- paste0("mapColor(", paste(paste(names(cally), cally, sep="="), collapse=", "), ")")
             } else {
                 datashield.assign(opals, paste0("what_factor_", i), as.symbol(paste0("dsFactor(", what[i], ")")))
@@ -175,7 +176,7 @@ coloring <- function(logins, func, symbol, what, continuous_scale = rep(TRUE, le
                 cally <- list(x=paste0("what_factor_", i),
                               levels=paste0("'", .encode.arg(globalLevels), "'"),
                               colors=paste0("'", .encode.arg(colors), "'"))
-                cally <- c(cally, args)
+                cally <- c(cally, arglist)
                 callys <- paste0("mapColor(", paste(paste(names(cally), cally, sep="="), collapse=", "), ")")
             }
             res <- datashield.aggregate(opals, as.symbol(callys), async=T)
