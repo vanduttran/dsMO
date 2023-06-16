@@ -63,7 +63,7 @@
 #' @param func Definition of a function for preparation of raw data matrices.
 #' @param symbol The symbol provided when calling the function \code{func} for data preparation.
 #' @param ... Other arguments of the function \code{name}, preferably in the same order.
-#' @import dsSwissKnifeClient keyring
+#' @import DSI keyring
 #' @examples 
 #' data(logindata)
 #' data(procFunc)
@@ -137,13 +137,14 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
 #' @param logins Login information of data repositories, where dsMOprimal is installed.
 #' @param func Definition of a function for preparation of raw data matrices.
 #' @param symbol The symbol provided when calling the function \code{func} for data preparation.
-#' @param variable The variable name used to map to color codes.
+#' @param what The variable names used to map to color codes, in form of 'data.frame$variable' or c('data.frame$variable1', ...).
 #' @param continuous_scale A logical value indicating whether the coloring mapping is continuous. Default: TRUE.
 #' @param nbreaks An integer indicating the number of intervals into which x is to be cut, less than 1/10 of number of samples, when x is the coloring scale is continuous.
 #' @param colors A vector of colors to interpolate, must be a valid argument to col2rgb(). Default: \code{c('orange', 'blue')}.
 #' @param ... arguments to pass to \code{colorRampPalette}
 #' @return A vector of The color codes for all samples
-#' @import dsSwissKnifeClient
+#' @import DSI
+#' @importFrom stats setNames
 #' @export
 #' @examples 
 #' data(logindata)
@@ -164,8 +165,8 @@ coloring <- function(logins, func, symbol, what, continuous_scale = rep(TRUE, le
             if (continuous_scale[i]) {
                 ranges <- datashield.aggregate(opals, as.symbol(paste0("dsRange(", what[i], ")")))
                 cally <- list(x=what[i],
-                              range.min=Reduce(min, ranges)*(1-error), # down min by error
-                              range.max=Reduce(max, ranges)*(1+error), # up max by error
+                              range.min=min(unlist(ranges))*(1-error), # down min by error
+                              range.max=max(unlist(ranges))*(1+error), # up max by error
                               nbreaks=nbreaks,
                               colors=paste0("'", .encode.arg(colors), "'"))
                 cally <- c(cally, arglist)

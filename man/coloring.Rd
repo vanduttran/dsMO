@@ -9,7 +9,7 @@ coloring(
   func,
   symbol,
   what,
-  continuous_scale = TRUE,
+  continuous_scale = rep(TRUE, length(what)),
   nbreaks = 2,
   colors = c("orange", "blue"),
   ...
@@ -22,6 +22,8 @@ coloring(
 
 \item{symbol}{The symbol provided when calling the function \code{func} for data preparation.}
 
+\item{what}{The variable names used to map to color codes, in form of 'data.frame$variable' or c('data.frame$variable1', ...).}
+
 \item{continuous_scale}{A logical value indicating whether the coloring mapping is continuous. Default: TRUE.}
 
 \item{nbreaks}{An integer indicating the number of intervals into which x is to be cut, less than 1/10 of number of samples, when x is the coloring scale is continuous.}
@@ -29,8 +31,6 @@ coloring(
 \item{colors}{A vector of colors to interpolate, must be a valid argument to col2rgb(). Default: \code{c('orange', 'blue')}.}
 
 \item{...}{arguments to pass to \code{colorRampPalette}}
-
-\item{variable}{The variable name used to map to color codes.}
 }
 \value{
 A vector of The color codes for all samples
