@@ -26,7 +26,7 @@
 #' @description This function ensures datashield.login to all the servers without error of simultaneously connecting to the same server
 #' @param logins A data frame of login information. See \code{datashield.login}
 #' @return Object(s) of class DSConnection
-#' @import DSI
+#' @import DSI DSOpal
 #' @keywords internal
 .login <- function(logins) {
     opals <- list()
@@ -63,7 +63,7 @@
 #' @param func Definition of a function for preparation of raw data matrices.
 #' @param symbol The symbol provided when calling the function \code{func} for data preparation.
 #' @param ... Other arguments of the function \code{name}, preferably in the same order.
-#' @import DSI keyring
+#' @import DSI DSOpal keyring
 #' @examples 
 #' data(logindata)
 #' data(procFunc)
@@ -143,7 +143,7 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
 #' @param colors A vector of colors to interpolate, must be a valid argument to col2rgb(). Default: \code{c('orange', 'blue')}.
 #' @param ... arguments to pass to \code{colorRampPalette}
 #' @return A vector of The color codes for all samples
-#' @import DSI
+#' @import DSI DSOpal
 #' @importFrom stats setNames
 #' @export
 #' @examples 
