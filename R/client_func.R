@@ -6,6 +6,7 @@
 #'  See \code{dsSwissKnifeClient:::.encode.arg}.
 #' @param some.object the object to be encoded
 #' @return encoded text with offending characters replaced by strings
+#' @import RCurl jsonlite
 #' @keywords internal
 .encode.arg <- function(some.object, serialize.it = TRUE){
     if(serialize.it){

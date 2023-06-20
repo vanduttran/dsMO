@@ -3,5 +3,8 @@
 export(coloring)
 export(exec)
 import(DSI)
+import(DSOpal)
+import(RCurl)
+import(jsonlite)
 import(keyring)
 importFrom(stats,setNames)

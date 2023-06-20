@@ -1,6 +1,6 @@
 Package: dsMO
 Title: Client Side Functions for Federated Multi-Omics Analysis on the Virtual Cohort
-Version: 0.1.22
+Version: 0.1.23
 Authors@R: 
     c(person(given = "Van Du T.",
              family = "Tran",
@@ -11,6 +11,8 @@ Authors@R:
              family = "Dragan",
              role = c("ctb")))
 Depends: R (>= 3.5.0), keyring, DSI, DSOpal
+Imports: RCurl, jsonlite
+Suggests: dsSwissKnifeClient
 Description: Client side functions for federated multi-omics analysis on the virtual cohort.
 License: file LICENSE
 Encoding: UTF-8
