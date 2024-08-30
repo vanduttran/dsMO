@@ -122,6 +122,7 @@
 #' }
 #' @export
 exec <- function(name, loginFD, logins, func, symbol, ...) {
+    timeStart <- Sys.time()
     ## check arguments
     name <- match.arg(name, choices=c('federatePCA',
                                       'federateRCCA',
@@ -195,6 +196,13 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
                      " --- ",
                      datashield.errors()))
     }, finally=datashield.logout(opalFD))
+    
+    timeStart <- Sys.time()
+    Sys.sleep(25)
+    timeFinish <- Sys.time()
+    cat("Execution time:",
+        difftime(timeFinish, timeStart, units = "secs"),
+        "seconds.\n")
     
     return (res)
 }
