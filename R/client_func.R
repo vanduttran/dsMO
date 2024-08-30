@@ -197,8 +197,6 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
                      datashield.errors()))
     }, finally=datashield.logout(opalFD))
     
-    timeStart <- Sys.time()
-    Sys.sleep(25)
     timeFinish <- Sys.time()
     cat("Execution time:",
         difftime(timeFinish, timeStart, units = "secs"),
