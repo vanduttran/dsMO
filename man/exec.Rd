@@ -7,35 +7,71 @@
 exec(name, loginFD, logins, func, symbol, ...)
 }
 \arguments{
-\item{name}{A character string naming the function to be called, among federatePCA, federateRCCA, federateComDim, federateSNF, federateUMAP, federateHdbscan.}
+\item{name}{A character string naming the function to be called, among
+federatePCA, federateRCCA, federateComDim, federateSNF, federateUMAP,
+federateHdbscan.}
 
-\item{loginFD}{Login information of the federated server, where the function \code{name} will be executed. 
-For functions using X'X, such as federatePCA, federateRCCA, this should be a server with dsMOprimal installed. 
-For functions using XX', such as federateComDim, federateSNF, federateUMAP, federateHdbscan, this should be a server with dsMOdual installed.}
+\item{loginFD}{Login information of the federated server, where the function
+\code{name} will be executed. 
+For functions using X'X, such as federatePCA, federateRCCA, this should be a
+server with dsMOprimal installed. 
+For functions using XX', such as federateComDim, federateSNF, federateUMAP,
+federateHdbscan, this should be a server with dsMOdual installed.}
 
-\item{logins}{Login information of data repositories, where dsMOprimal is installed.}
+\item{logins}{Login information of data repositories, where dsMOprimal is
+installed.}
 
 \item{func}{Definition of a function for preparation of raw data matrices.}
 
-\item{symbol}{The symbol provided when calling the function \code{func} for data preparation.}
+\item{symbol}{The symbol provided when calling the function \code{func} for
+data preparation.}
 
-\item{...}{Other arguments of the function \code{name}, preferably in the same order.}
+\item{...}{Other arguments of the function \code{name}, preferably in the
+same order.}
 }
 \description{
-This wrapper function is used to call all the federated analysis functions provided in the dsMO package suite.
+This wrapper function is used to call all the federated
+analysis functions provided in the dsMO package suite.
 }
 \examples{
 data(logindata)
 data(procFunc)
 \donttest{
-res.pca <- exec('federatePCA', loginFD=logindata[1,], logins=logindata[1:2,], func=procFunc$SingleOmics, symbol='rawDataX')
-res.rcca <- exec('federateRCCA', loginFD=logindata[1,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
-      0.001, 0.001, TRUE, 
-      dsMO:::.encode.arg(list(nfold = 2, grid1 = seq(0.001, 1, length = 1), grid2 = seq(0.001, 1, length = 1))))
-res.comdim <- exec('federateComDim', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'),
-      2, 'none', 'uniform')
-res.snf <- exec('federateSNF', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
-res.umap <- exec('federateUMAP', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
-res.hdbscan <- exec('federateHdbscan', loginFD=logindata[3,], logins=logindata[1:2,], func=procFunc$BiOmics, symbol=c('rawDataX', 'rawDataY'))
+res.pca <- exec('federatePCA',
+                 loginFD=logindata[1,],
+                 logins=logindata[1:2,],
+                 func=procFunc$SingleOmics,
+                 symbol='rawDataX')
+res.rcca <- exec('federateRCCA',
+                  loginFD=logindata[1,],
+                  logins=logindata[1:2,],
+                  func=procFunc$BiOmics,
+                  symbol=c('rawDataX', 'rawDataY'),
+                  lambda1=0.001,
+                  lambda2=0.001,
+                  tune=FALSE)
+res.comdim <- exec('federateComDim',
+                    loginFD=logindata[3,],
+                    logins=logindata[1:2,],
+                    func=procFunc$BiOmics,
+                    symbol=c('rawDataX', 'rawDataY'),
+                    ncomp=2,
+                    scale='none',
+                    option='uniform')
+res.snf <- exec('federateSNF',
+                 loginFD=logindata[3,],
+                 logins=logindata[1:2,],
+                 func=procFunc$BiOmics,
+                 symbol=c('rawDataX', 'rawDataY'))
+res.umap <- exec('federateUMAP',
+                  loginFD=logindata[3,],
+                  logins=logindata[1:2,],
+                  func=procFunc$BiOmics,
+                  symbol=c('rawDataX', 'rawDataY'))
+res.hdbscan <- exec('federateHdbscan',
+                     loginFD=logindata[3,],
+                     logins=logindata[1:2,],
+                     func=procFunc$BiOmics,
+                     symbol=c('rawDataX', 'rawDataY'))
 }
 }
