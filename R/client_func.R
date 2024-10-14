@@ -60,6 +60,7 @@
 
 
 #' @title Wrapper call function for non-disclosive federated analysis
+#' @usage exec(name, loginFD, logins, func, symbol, ...)
 #' @description This wrapper function is used to call all the federated
 #' analysis functions provided in the dsMO package suite.
 #' @param name A character string naming the function to be called, among
@@ -184,7 +185,8 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
                   .encode.arg(logins),
                   .encode.arg(func, serialize.it=T),
                   .encode.arg(symbol))
-    cally <- c(cally, list(...)) # pass customized options of the function 'name'
+    # pass customized options of the function 'name'
+    cally <- c(cally, list(...))
     opalFD <- .login(loginFD) #datashield.login(loginFD)
     tryCatch({
         res <- datashield.aggregate(opalFD,
@@ -207,6 +209,11 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
 
 
 #' @title Coloring schema for plotting
+#' @usage coloring(logins, func, symbol, what,
+#'                 continuous_scale = rep(TRUE, length(what)),
+#'                 nbreaks = 2,
+#'                 colors = c('orange', 'blue'),
+#'                 ...)
 #' @description This functions mapped data values from a variable in the
 #' virtual cohort to color codes.
 #' @param logins Login information of data repositories, where dsMOprimal is
@@ -222,7 +229,7 @@ exec <- function(name, loginFD, logins, func, symbol, ...) {
 #' to be cut, less than 1/10 of number of samples, when x is the coloring scale
 #' is continuous.
 #' @param colors A vector of colors to interpolate, must be a valid argument to
-#' col2rgb(). Default: \code{c('orange', 'blue')}.
+#' col2rgb(). Default, \code{c('orange', 'blue')}, min to max \code{what} value
 #' @param ... arguments to pass to \code{colorRampPalette}
 #' @return A vector of The color codes for all samples
 #' @import DSI DSOpal
@@ -261,12 +268,13 @@ coloring <- function(logins, func, symbol, what,
                 ranges <- datashield.aggregate(opals,
                                                as.symbol(paste0("dsRange(",
                                                                 what[i], ")")))
-                cally <- list(what[i],
-                              min(unlist(ranges))*(1-error), # down min by error
-                              max(unlist(ranges))*(1+error), # up max by error
-                              NA,
-                              nbreaks,
-                              paste0("'", .encode.arg(colors), "'"))
+                cally <- list(
+                    what[i],
+                    min(unlist(ranges))*(1-error), # lower min by error
+                    max(unlist(ranges))*(1+error), # upper max by error
+                    NA,
+                    nbreaks,
+                    paste0("'", .encode.arg(colors), "'"))
                 cally <- c(cally, arglist)
                 callys <- paste0("mapColor(",
                                  paste(paste(names(cally), cally, sep=""),
@@ -304,51 +312,12 @@ coloring <- function(logins, func, symbol, what,
                              unlist(resNames)))
         })
     }, error=function(e) {
-        print(paste0("Function coloring failed: ", e, " --- ", datashield.errors()))
+        print(paste0("Function coloring failed: ",
+                     e,
+                     " --- ",
+                     datashield.errors()))
     }, finally=datashield.logout(opals))
-    names(res.all) <- what
     
-    return (res.all)
-}
-
-coloring.bak <- function(logins, func, symbol, what,
-                         continuous_scale = rep(TRUE, length(what)),
-                         nbreaks = 2,
-                         colors = c('orange', 'blue'), ...) {
-    error <- 0.01
-    if (any(!grepl("$", what))) stop("what should be variables of a data frame in form of 'data.frame$variable'")
-    opals <- .login(logins)
-    func(opals, symbol)
-    arglist <- list(...)
-    
-    tryCatch({
-        res.all <- lapply(1:length(what), function(i) {
-            if (continuous_scale[i]) {
-                ranges <- datashield.aggregate(opals, as.symbol(paste0("dsRange(", what[i], ")")))
-                cally <- list(x=what[i],
-                              range.min=min(unlist(ranges))*(1-error), # down min by error
-                              range.max=max(unlist(ranges))*(1+error), # up max by error
-                              nbreaks=nbreaks,
-                              colors=paste0("'", .encode.arg(colors), "'"))
-                cally <- c(cally, arglist)
-                callys <- paste0("mapColor(", paste(paste(names(cally), cally, sep="="), collapse=", "), ")")
-            } else {
-                datashield.assign(opals, paste0("what_factor_", i), as.symbol(paste0("dsFactor(", what[i], ")")))
-                globalLevels <- Reduce(union, datashield.aggregate(opals, as.symbol(paste0("dsLevels(what_factor_", i, ")"))))
-                cally <- list(x=paste0("what_factor_", i),
-                              levels=paste0("'", .encode.arg(globalLevels), "'"),
-                              colors=paste0("'", .encode.arg(colors), "'"))
-                cally <- c(cally, arglist)
-                callys <- paste0("mapColor(", paste(paste(names(cally), cally, sep="="), collapse=", "), ")")
-            }
-            res <- datashield.aggregate(opals, as.symbol(callys), async=T)
-            resNames <- datashield.aggregate(opals, as.symbol(paste0("rowNames(", symbol, ")")))
-
-            return (setNames(unlist(res), unlist(resNames)))
-        })
-    }, 
-    error=function(e) print(paste0("Function coloring failed: ", e, " --- ", datashield.errors())), 
-    finally=datashield.logout(opals))
     names(res.all) <- what
     
     return (res.all)

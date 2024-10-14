@@ -4,16 +4,11 @@
 \alias{coloring}
 \title{Coloring schema for plotting}
 \usage{
-coloring(
-  logins,
-  func,
-  symbol,
-  what,
-  continuous_scale = rep(TRUE, length(what)),
-  nbreaks = 2,
-  colors = c("orange", "blue"),
-  ...
-)
+coloring(logins, func, symbol, what,
+                continuous_scale = rep(TRUE, length(what)),
+                nbreaks = 2,
+                colors = c('orange', 'blue'),
+                ...)
 }
 \arguments{
 \item{logins}{Login information of data repositories, where dsMOprimal is
@@ -35,7 +30,7 @@ to be cut, less than 1/10 of number of samples, when x is the coloring scale
 is continuous.}
 
 \item{colors}{A vector of colors to interpolate, must be a valid argument to
-col2rgb(). Default: \code{c('orange', 'blue')}.}
+col2rgb(). Default, \code{c('orange', 'blue')}, min to max \code{what} value}
 
 \item{...}{arguments to pass to \code{colorRampPalette}}
 }
